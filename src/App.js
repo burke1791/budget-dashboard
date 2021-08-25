@@ -2,7 +2,7 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { navigate, Router } from '@reach/router';
 import 'antd/dist/antd.css'
-import Overview from './pages/overview';
+import Budget from './pages/budget';
 import Accounts from './pages/accounts';
 import Categories from './pages/categories';
 
@@ -25,8 +25,8 @@ function App() {
         }}
       >
         <Menu theme='dark' mode='inline' defaultSelectedKeys={['overview']} onClick={handleNav}>
-          <Menu.Item key='overview'>
-            Overview
+          <Menu.Item key='budget'>
+            Budget
           </Menu.Item>
           <Menu.Item key='accounts'>
             Accounts
@@ -40,7 +40,7 @@ function App() {
       <Layout style={{ marginLeft: 200, minHeight: '100vh', height: '100%' }} theme='light'>
         <Content>
           <Router>
-            <Overview path='/overview' />
+            <Budget path='/budget' />
             <Accounts path='/accounts' />
             <Categories path='/categories' />
           </Router>
