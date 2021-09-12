@@ -56,7 +56,7 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData }) 
     });
   };
 
-  return [data];
+  return [data, new Date()];
 };
 
 export default useData;

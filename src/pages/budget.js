@@ -1,23 +1,20 @@
-import { Card, Col, DatePicker, Layout, Menu, Row, Select, Statistic, Typography } from 'antd';
+import { Badge, Col, DatePicker, Layout, Row, Statistic } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import React, { Fragment, useEffect, useState } from 'react';
 import moment from 'moment';
-import OverviewCards from '../components/overviewCards';
-import useData from '../hooks/useData';
-import { parseCashFlow } from '../utilities/apiHelper';
-import { ENDPOINTS } from '../utilities/constants';
+import { useBudgetState } from '../context/budgetContext';
+import CategorySpending from '../components/categorySpending';
 
 const { Content, Header } = Layout;
-const { Title } = Typography;
-const { Option } = Select;
 
 function Budget() {
 
   const [month, setMonth] = useState('');
-  const [cashFlowArr] = useData({ endpoint: ENDPOINTS.CASHFLOW, method: 'GET', processData: parseCashFlow });
   const [cashFlowIn, setCashFlowIn] = useState(0);
   const [cashFlowOut, setCashFlowOut] = useState(0);
+
+  const { cashFlowArr, cashFlowArr_trigger } = useBudgetState();
 
   useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {
@@ -25,13 +22,14 @@ function Budget() {
 
       setCashFlows({ cashFlowIn: cashIn, cashFlowOut: cashOut });
     }
-  }, [cashFlowArr]);
+  }, [cashFlowArr_trigger]);
 
-  const monthSelected = (event, option) => {
+  const monthSelected = (event) => {
     if (event != null) {
-      setMonth(option);
+      let monthString = event.format('YYYY-MM');
+      setMonth(monthString);
 
-      let [cashIn, cashOut] = findCashFlow(option);
+      let [cashIn, cashOut] = findCashFlow(monthString);
       setCashFlows({ cashFlowIn: cashIn, cashFlowOut: cashOut });
     }
   }
@@ -55,8 +53,18 @@ function Budget() {
           <Col flex='none'>
             <DatePicker
               picker='month'
+              format='MMM YYYY'
               defaultPickerValue={moment()}
               defaultValue={moment()}
+              monthCellRender={(current) => {
+                let unassignedCount = cashFlowArr.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
+
+                return (
+                  <Badge count={unassignedCount} overflowCount={9} offset={[10, 0]}>
+                    {current.format('MMM')}
+                  </Badge>
+                );
+              }}
               onChange={monthSelected}
               style={{ marginLeft: 8, marginTop: 16 }}
             />
@@ -84,7 +92,9 @@ function Budget() {
         </Row>    
       </Header>
 
-      <OverviewCards />
+      <Content>
+        <CategorySpending />
+      </Content>
     </Fragment>
   )
 }

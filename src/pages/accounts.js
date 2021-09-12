@@ -1,15 +1,14 @@
 import React, { Fragment } from 'react';
 import { Row, Layout, Typography, Table } from 'antd';
 import 'antd/dist/antd.css';
-import useData from '../hooks/useData';
-import { ENDPOINTS } from '../utilities/constants';
+import { useBudgetState } from '../context/budgetContext';
 
 const { Header } = Layout;
 const { Title } = Typography;
 
 function Accounts(props) {
 
-  const [accounts] = useData({ endpoint: ENDPOINTS.ACCOUNTS, method: 'GET' });
+  const { accounts } = useBudgetState();
 
   return (
     <Fragment>

@@ -1,9 +1,7 @@
 import React, { Fragment } from 'react';
 import { Layout, Row, Table, List, Typography } from 'antd';
 import 'antd/dist/antd.css';
-import useData from '../hooks/useData';
-import { parseCategories } from '../utilities/apiHelper';
-import { ENDPOINTS } from '../utilities/constants';
+import { useBudgetState } from '../context/budgetContext';
 
 const { Header } = Layout;
 const { Title } = Typography;
@@ -11,7 +9,7 @@ const { Column } = Table;
 
 function Categories() {
 
-  const [categories] = useData({ endpoint: ENDPOINTS.CATEGORIES, method: 'GET', processData: parseCategories });
+  const { budgetCategories } = useBudgetState();
 
   return (
     <Fragment>
@@ -28,7 +26,7 @@ function Categories() {
       </Row>
       <Row justify='center'>
         <Table
-          dataSource={categories}
+          dataSource={budgetCategories}
           rowKey='groupId'
           size='small'
           pagination={false}

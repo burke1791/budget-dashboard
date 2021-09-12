@@ -2,11 +2,11 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { navigate, Router } from '@reach/router';
 import 'antd/dist/antd.css'
-import Budget from './pages/budget';
-import Accounts from './pages/accounts';
-import Categories from './pages/categories';
 
-const { Sider, Header, Content } = Layout;
+import { BudgetProvider } from './context/budgetContext';
+import MainWrapper from './components/mainWrapper';
+
+const { Sider } = Layout;
 
 function App() {
 
@@ -15,38 +15,32 @@ function App() {
   }
 
   return (
-    <Layout>
-      <Sider
-        style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-        }}
-      >
-        <Menu theme='dark' mode='inline' defaultSelectedKeys={['overview']} onClick={handleNav}>
-          <Menu.Item key='budget'>
-            Budget
-          </Menu.Item>
-          <Menu.Item key='accounts'>
-            Accounts
-          </Menu.Item>
-          <Menu.Item key='categories'>
-            Categories
-          </Menu.Item>
-        </Menu>
-      </Sider>
+    <BudgetProvider>
+      <Layout>
+        <Sider
+          style={{
+            overflow: 'auto',
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+          }}
+        >
+          <Menu theme='dark' mode='inline' defaultSelectedKeys={['budget']} onClick={handleNav}>
+            <Menu.Item key='budget'>
+              Budget
+            </Menu.Item>
+            <Menu.Item key='accounts'>
+              Accounts
+            </Menu.Item>
+            <Menu.Item key='categories'>
+              Categories
+            </Menu.Item>
+          </Menu>
+        </Sider>
 
-      <Layout style={{ marginLeft: 200, minHeight: '100vh', height: '100%' }} theme='light'>
-        <Content>
-          <Router>
-            <Budget path='/budget' />
-            <Accounts path='/accounts' />
-            <Categories path='/categories' />
-          </Router>
-        </Content>
+        <MainWrapper />
       </Layout>
-    </Layout>
+    </BudgetProvider>
   );
 }
 
