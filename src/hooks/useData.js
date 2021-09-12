@@ -44,7 +44,6 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData }) 
 
   const fetchApi = () => {
     let options = generateRequestOptions({ endpoint, method, headers, payload });
-    console.log(options);
 
     return new Promise((resolve, reject) => {
       axios(options).then(response => {
