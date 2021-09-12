@@ -1,29 +1,27 @@
 import moment from 'moment';
 
-const processCategories = (categories) => {
+const parseCategories = (categories) => {
   let categoryGroups = [];
   let processedGroups = [];
 
   categories.forEach(category => {
-    let groupId = category.categoryGroup.categoryGroupId;
-    let groupName = category.categoryGroup.categoryGroupName;
+    let groupId = category.categoryGroupId;
+    let groupName = category.categoryGroupName;
+
+    let cat = {
+      categoryId: category.categoryId,
+      categoryName: category.categoryName
+    };
 
     if (processedGroups.find(groupNum => { return groupNum == groupId})) {
-      let cat = {
-        categoryId: category.categoryId,
-        categoryName: category.categoryName
-      };
-
+      // if we've already parsed the categoryGroup, add this category to the list
       categoryGroups.find(group => group.groupId == groupId).categories.push(cat);
     } else {
-      let cat = {
-        categoryId: category.categoryId,
-        categoryName: category.categoryName
-      };
-
+      // new categoryGroup
       let group = {
         groupId: groupId,
         groupName: groupName,
+        displayOrder: category.displayOrder,
         categories: [cat]
       };
 
@@ -49,6 +47,6 @@ const parseCashFlow = (cashFlowArr) => {
 }
 
 export {
-  processCategories,
+  parseCategories,
   parseCashFlow
 }

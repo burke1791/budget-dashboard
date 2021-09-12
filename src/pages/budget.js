@@ -15,7 +15,7 @@ const { Option } = Select;
 function Budget() {
 
   const [month, setMonth] = useState('');
-  const [cashFlowArr] = useData({ endpoint: ENDPOINTS.GET_CASHFLOW, method: 'GET', processData: parseCashFlow });
+  const [cashFlowArr] = useData({ endpoint: ENDPOINTS.CASHFLOW, method: 'GET', processData: parseCashFlow });
   const [cashFlowIn, setCashFlowIn] = useState(0);
   const [cashFlowOut, setCashFlowOut] = useState(0);
 

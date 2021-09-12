@@ -9,7 +9,7 @@ const { Title } = Typography;
 
 function Accounts(props) {
 
-  const [accounts] = useData({ endpoint: ENDPOINTS.GET_ACCOUNTS, method: 'GET' });
+  const [accounts] = useData({ endpoint: ENDPOINTS.ACCOUNTS, method: 'GET' });
 
   return (
     <Fragment>

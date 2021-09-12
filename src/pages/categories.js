@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Layout, Row, Table, List, Typography } from 'antd';
 import 'antd/dist/antd.css';
 import useData from '../hooks/useData';
-import { processCategories } from '../utilities/apiHelper';
+import { parseCategories } from '../utilities/apiHelper';
 import { ENDPOINTS } from '../utilities/constants';
 
 const { Header } = Layout;
@@ -11,7 +11,7 @@ const { Column } = Table;
 
 function Categories() {
 
-  const [categories] = useData({ endpoint: ENDPOINTS.GET_CATEGORIES, method: 'GET', processData: processCategories });
+  const [categories] = useData({ endpoint: ENDPOINTS.CATEGORIES, method: 'GET', processData: parseCategories });
 
   return (
     <Fragment>
