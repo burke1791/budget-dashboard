@@ -1,10 +1,12 @@
+import '../../__mocks__/matchMedia.mock';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Overview from '../../pages/overview';
+import Budget from '../../pages/budget';
 
-describe('overview component', () => {
+
+describe('budget page', () => {
   test('renders properly', () => {
-    render(<Overview />);
+    render(<Budget />);
     expect(1).toBe(1);
   });
 });
