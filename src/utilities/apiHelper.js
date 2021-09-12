@@ -1,3 +1,4 @@
+import moment from 'moment';
 
 const processCategories = (categories) => {
   let categoryGroups = [];
@@ -34,6 +35,20 @@ const processCategories = (categories) => {
   return categoryGroups;
 }
 
+const parseCashFlow = (cashFlowArr) => {
+  return cashFlowArr.map(cashFlow => {
+    let month = moment(cashFlow.transactionMonth);
+
+    return {
+      month: month,
+      cashFlowIn: cashFlow.cashFlowIn,
+      cashFlowOut: cashFlow.cashFlowOut,
+      unassignedTransactions: cashFlow.unassignedTransactionCount
+    };
+  });
+}
+
 export {
-  processCategories
+  processCategories,
+  parseCashFlow
 }

@@ -5,7 +5,8 @@ import React, { Fragment, useEffect, useState } from 'react';
 import moment from 'moment';
 import OverviewCards from '../components/overviewCards';
 import useData from '../hooks/useData';
-import { parseCashFlow } from '../helper/api';
+import { parseCashFlow } from '../utilities/apiHelper';
+import { ENDPOINTS } from '../utilities/constants';
 
 const { Content, Header } = Layout;
 const { Title } = Typography;
@@ -14,7 +15,7 @@ const { Option } = Select;
 function Budget() {
 
   const [month, setMonth] = useState('');
-  const [cashFlowArr] = useData({ endpoint: 'api/CashFlow/', processData: parseCashFlow });
+  const [cashFlowArr] = useData({ endpoint: ENDPOINTS.GET_CASHFLOW, processData: parseCashFlow });
   const [cashFlowIn, setCashFlowIn] = useState(0);
   const [cashFlowOut, setCashFlowOut] = useState(0);
 
