@@ -93,7 +93,7 @@ function Budget() {
       </Header>
 
       <Content>
-        <CategorySpending />
+        <CategorySpending month={month} />
       </Content>
     </Fragment>
   )
