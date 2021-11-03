@@ -57,7 +57,7 @@ function Budget() {
               defaultPickerValue={moment()}
               defaultValue={moment()}
               monthCellRender={(current) => {
-                let unassignedCount = cashFlowArr.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
+                let unassignedCount = cashFlowArr?.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
 
                 return (
                   <Badge count={unassignedCount} overflowCount={9} offset={[10, 0]}>
