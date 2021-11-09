@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
  * @param {Object} options.payload - HTTP payload - used for POST requests
  * @param {Function} options.processData - function for processing data returned by the API
  */
-function useData({ endpoint, method, headers = {}, payload = {}, processData }) {
+function useData({ endpoint, method, headers = {}, payload = {}, processData, refreshTrigger }) {
 
   const [data, setData] = useState();
 
@@ -26,7 +26,7 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData }) 
     fetchApi().then(data => {
       setData(data);
     });
-  }, [stringifiedEndpoint, stringifiedHeaders, processJson]);
+  }, [stringifiedEndpoint, stringifiedHeaders, processJson, refreshTrigger]);
 
   const generateRequestOptions = ({ endpoint, method, headers = {}, payload = {} }) => {
     let options = {

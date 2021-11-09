@@ -77,8 +77,13 @@ const parseCategorySpending = (categorySpending) => {
   return arr;
 }
 
+const calculateTotalUnassignedTransactions = (unassigned) => {
+  return unassigned.reduce((prev, current) => prev + current.unassignedTransactions, 0);
+}
+
 export {
   parseCategories,
   parseCashFlow,
-  parseCategorySpending
+  parseCategorySpending,
+  calculateTotalUnassignedTransactions
 }

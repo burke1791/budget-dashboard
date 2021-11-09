@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { navigate } from '@reach/router';
-import { Layout, Menu } from 'antd';
+import { Badge, Layout, Menu, Typography } from 'antd';
 import 'antd/dist/antd.css'
+import useData from '../hooks/useData';
+import { ENDPOINTS } from '../utilities/constants';
+import { calculateTotalUnassignedTransactions } from '../utilities/apiHelper';
 
 const { Sider } = Layout;
+const { Text } = Typography;
 
 function Sidenav(props) {
 
+  const [selectedItem, setSelectedItem] = useState('dashboard');
+
+  const [unassignedTransactionCount, unassignedTransactionCountFetchDate] = useData({
+    endpoint: ENDPOINTS.UNASSIGNED_TRANSACTION_COUNTS,
+    method: 'GET',
+    processData: calculateTotalUnassignedTransactions
+  });
+
   const handleNav = (event) => {
+    setSelectedItem(event.key);
     navigate(`/${event.key}`);
+  }
+
+  const textColorStyle = (itemKey) => {
+    if (itemKey === selectedItem) return { color: 'rgb(255, 255, 255)' };
+
+    return { color: 'rgba(255, 255, 255, 0.65)' };
   }
 
   return (
@@ -20,7 +39,7 @@ function Sidenav(props) {
         left: 0,
       }}
     >
-      <Menu theme='dark' mode='inline' defaultSelectedKeys={['dashboard']} onClick={handleNav}>
+      <Menu theme='dark' mode='inline' selectedKeys={[selectedItem]} onClick={handleNav}>
         <Menu.Item key='dashboard'>
           Dashboard
         </Menu.Item>
@@ -31,7 +50,9 @@ function Sidenav(props) {
           Accounts
         </Menu.Item>
         <Menu.Item key='transactions'>
-          Transactions
+          <Badge count={unassignedTransactionCount} overflowCount={9} offset={[18, 0]} title={`${unassignedTransactionCount} unassigned transactions`}>
+            <Text style={textColorStyle('transactions')}>Transactions</Text>
+          </Badge>
         </Menu.Item>
         <Menu.Item key='categories'>
           Categories

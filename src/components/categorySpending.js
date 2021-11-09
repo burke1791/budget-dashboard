@@ -37,9 +37,7 @@ function CategorySpending(props) {
       size='small'
       expandable={{
         defaultExpandAllRows: true,
-        expandedRowRender: generateCategoriesForCategoryGroup,
-        indentSize: 0,
-        fixed: 'left'
+        expandedRowRender: generateCategoriesForCategoryGroup
       }}
       rowKey='categoryGroupId'
     >
