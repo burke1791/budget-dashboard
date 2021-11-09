@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'antd';
+import { Table, Typography } from 'antd';
 import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
+import { parseCategorySpending } from '../utilities/apiHelper';
 
+const { Text } = Typography;
 const { Column } = Table;
 
 function CategorySpending(props) {
 
   const [loading, setLoading] = useState(true);
-  const [categorySpending, categorySpendingFetchDate] = useData({ endpoint: `${ENDPOINTS.CATEGORY_SPENDING}/${props.month}`, method: 'GET' });
+  const [categorySpending, categorySpendingFetchDate] = useData({ endpoint: `${ENDPOINTS.CATEGORY_SPENDING}/${props.month}`, method: 'GET', processData: parseCategorySpending });
 
   useEffect(() => {
     setLoading(true);
@@ -21,43 +23,50 @@ function CategorySpending(props) {
   }, [categorySpendingFetchDate]);
 
   const generateCategoriesForCategoryGroup = (record, index, indent, expanded) => {
-    console.log(record);
-
-    return null;
-
     return (
-      <CategorySpending categorySpending={record} />
+      <NestedCategoryTable categorySpending={record} />
     );
   }
 
   return (
     <Table
       bordered
+      pagination={false}
       dataSource={categorySpending}
       loading={loading}
       size='small'
       expandable={{
         defaultExpandAllRows: true,
-        expandedRowRender: generateCategoriesForCategoryGroup
+        expandedRowRender: generateCategoriesForCategoryGroup,
+        indentSize: 0,
+        fixed: 'left'
       }}
+      rowKey='categoryGroupId'
     >
       <Column
-        colSpan={9}
+        // colSpan={9}
         dataIndex='categoryGroupName'
-      >
-        Category
-      </Column>
+        title='Category'
+        render={(text) => {
+          return (
+            <Text strong>{text}</Text>
+          )
+        }}
+      />
       <Column
-        colSpan={5}
+        // colSpan={5}
         dataIndex='spent'
-      >
-        Spent
-      </Column>
+        title='Spent'
+        render={(text) => {
+          return (
+            <Text strong>{text}</Text>
+          )
+        }}
+      />
       <Column
-        colSpan={5}
-      >
-        Budgeted Amount
-      </Column>
+        // colSpan={5}
+        title='Budgeted Amount'
+      />
     </Table>
   );
 }
@@ -67,25 +76,24 @@ export default CategorySpending;
 
 function NestedCategoryTable(props) {
 
-  const columns = [
-    {
-      dataIndex: 'categoryname',
-    },
-    {
-      dataIndex: 'spent'
-    },
-    {
-      dataIndex: 'target',
-      key: 'targetId'
-    }
-  ]
-
   return (
     <Table
       bordered
-      columns={columns}
-      dataSource={props.categorySpending}
+      pagination={false}
+      dataSource={props.categorySpending.subCategories}
       size='small'
-    />
+      rowKey='categoryId'
+    >
+      <Column
+        dataIndex='categoryName'
+      />
+      <Column
+        dataIndex='spent'
+      />
+      <Column
+        dataIndex='target'
+        key='targetId'
+      />
+    </Table>
   );
 }

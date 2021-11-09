@@ -93,7 +93,11 @@ function Budget() {
       </Header>
 
       <Content>
-        <CategorySpending month={month} />
+        <Row justify='center'>
+          <Col span={20}>
+            <CategorySpending month={month} />
+          </Col>
+        </Row>
       </Content>
     </Fragment>
   )
