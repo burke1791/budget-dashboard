@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { Layout } from 'antd';
-import { Router } from '@reach/router';
+import { Redirect, Router } from '@reach/router';
 import Budget from '../pages/budget';
 import Accounts from '../pages/accounts';
 import Categories from '../pages/categories';
+import Dashboard from '../pages/dashboard';
+import Transactions from '../pages/transactions';
 
 import 'antd/dist/antd.css';
 import useData from '../hooks/useData';
@@ -40,8 +42,12 @@ function MainWrapper() {
   return (
     <Layout style={{ marginLeft: 200, minHeight: '100vh', height: '100%' }} theme='light'>
       <Router>
+        <Redirect noThrow from='/' to='/dashboard' />
+
+        <Dashboard path='/dashboard' />
         <Budget path='/budget' />
         <Accounts path='/accounts' />
+        <Transactions path='/transactions' />
         <Categories path='/categories' />
       </Router>
     </Layout>
