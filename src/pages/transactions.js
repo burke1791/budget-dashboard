@@ -41,9 +41,9 @@ function Transactions(props) {
   }
 
   const getRowClass = (record) => {
-    if (record.isUncategorized) return 'tx-uncategorized';
+    if (record.isUncategorized) return 'tx-uncategorized row-clickable';
 
-    return null;
+    return 'row-clickable';
   }
   
   return (

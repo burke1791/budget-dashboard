@@ -3,6 +3,7 @@ import { Table, Typography } from 'antd';
 import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
 import { parseCategorySpending } from '../utilities/apiHelper';
+import { formatMoney } from '../utilities/formatter';
 
 const { Text } = Typography;
 const { Column } = Table;
@@ -57,7 +58,7 @@ function CategorySpending(props) {
         title='Spent'
         render={(text) => {
           return (
-            <Text strong>{text}</Text>
+            <Text strong>{formatMoney(text)}</Text>
           )
         }}
       />
@@ -87,6 +88,7 @@ function NestedCategoryTable(props) {
       />
       <Column
         dataIndex='spent'
+        render={(text) => formatMoney(text)}
       />
       <Column
         dataIndex='target'

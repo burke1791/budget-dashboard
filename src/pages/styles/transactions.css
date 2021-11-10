@@ -2,3 +2,7 @@
 .tx-uncategorized {
   background-color: #ffe1e1;
 }
+
+.row-clickable {
+  cursor: pointer;
+}
