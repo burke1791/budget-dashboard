@@ -11,6 +11,39 @@ function Categories() {
 
   const { budgetCategories } = useBudgetState();
 
+  const parseBudgetCategories = () => {
+    let categoryGroups = [];
+    let processedGroups = [];
+
+    budgetCategories.forEach(category => {
+      let groupId = category.categoryGroupId;
+      let groupName = category.categoryGroupName;
+
+      let cat = {
+        categoryId: category.categoryId,
+        categoryName: category.categoryName
+      };
+
+      if (processedGroups.find(groupNum => { return groupNum == groupId})) {
+        // if we've already parsed the categoryGroup, add this category to the list
+        categoryGroups.find(group => group.groupId == groupId).categories.push(cat);
+      } else {
+        // new categoryGroup
+        let group = {
+          groupId: groupId,
+          groupName: groupName,
+          displayOrder: category.displayOrder,
+          categories: [cat]
+        };
+
+        categoryGroups.push(group);
+        processedGroups.push(groupId);
+      }
+    });
+
+    return categoryGroups;
+  }
+
   return (
     <Fragment>
       <Row justify='center'>
@@ -26,7 +59,7 @@ function Categories() {
       </Row>
       <Row justify='center'>
         <Table
-          dataSource={budgetCategories}
+          dataSource={parseBudgetCategories()}
           rowKey='groupId'
           size='small'
           pagination={false}

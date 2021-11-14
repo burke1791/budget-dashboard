@@ -10,14 +10,15 @@ import Transactions from '../pages/transactions';
 import 'antd/dist/antd.css';
 import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
-import { parseCategories, parseCashFlow } from '../utilities/apiHelper';
+import { parseCashFlow } from '../utilities/apiHelper';
 import { useBudgetDispatch } from '../context/budgetContext';
 
 function MainWrapper() {
 
   const [cashFlowArr, cashFlowFetchDate] = useData({ endpoint: ENDPOINTS.CASHFLOW, method: 'GET', processData: parseCashFlow });
-  const [categories, categoryFetchDate] = useData({ endpoint: ENDPOINTS.CATEGORIES, method: 'GET', processData: parseCategories });
+  const [categories, categoryFetchDate] = useData({ endpoint: ENDPOINTS.CATEGORIES, method: 'GET' });
   const [accounts, accountFetchDate] = useData({ endpoint: ENDPOINTS.ACCOUNTS, method: 'GET' });
+  const [merchants, merchantFetchDate] = useData({ endpoint: ENDPOINTS.MERCHANTS, method: 'GET' });
 
   const budgetDispatch = useBudgetDispatch();
 
@@ -38,6 +39,12 @@ function MainWrapper() {
       budgetDispatch({ type: 'update', key: 'accounts', value: accounts });
     }
   }, [accountFetchDate]);
+
+  useEffect(() => {
+    if (merchants && merchants.length > 0) {
+      budgetDispatch({ type: 'update', key: 'merchants', value: merchants });
+    }
+  }, [merchantFetchDate]);
 
   return (
     <Layout style={{ marginLeft: 200, minHeight: '100vh', height: '100%' }} theme='light'>

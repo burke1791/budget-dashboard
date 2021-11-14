@@ -1,6 +1,7 @@
 import { Layout, Row, Col, Table, DatePicker, Badge } from 'antd';
 import moment from 'moment';
 import React, { Fragment, useEffect, useState } from 'react';
+import UncategorizedTransactionModal from '../components/uncategorizedTransactionModal';
 import { useBudgetDispatch } from '../context/budgetContext';
 import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
@@ -15,6 +16,8 @@ function Transactions(props) {
   const [month, setMonth] = useState('');
   const [transactionTrigger, setTransactionTrigger] = useState(null);
   const [transactionsLoading, setTransactionsLoading] = useState(true);
+  const [selectedTransaction, setSelectedTransaction] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [transactions, transactionsFetchDate] = useData({
     endpoint: `${ENDPOINTS.FULL_TRANSACTIONS_BY_MONTH}/${month}`,
@@ -40,10 +43,20 @@ function Transactions(props) {
     }
   }
 
+  const transactionClick = (transaction) => {
+    setSelectedTransaction(transaction);
+    setModalVisible(true);
+  }
+
   const getRowClass = (record) => {
     if (record.isUncategorized) return 'tx-uncategorized row-clickable';
 
     return 'row-clickable';
+  }
+
+  const dismissModal = () => {
+    setSelectedTransaction({});
+    setModalVisible(false);
   }
   
   return (
@@ -83,6 +96,11 @@ function Transactions(props) {
               size='small'
               rowKey='transactionId'
               rowClassName={getRowClass}
+              onRow={(record) => {
+                return {
+                  onClick: () => transactionClick(record)
+                };
+              }}
             >
               <Column
                 dataIndex='transactionDate'
@@ -114,6 +132,11 @@ function Transactions(props) {
           </Col>
         </Row>
       </Content>
+      <UncategorizedTransactionModal
+        visible={modalVisible}
+        dismiss={dismissModal}
+        uncategorizedTransaction={selectedTransaction}
+      />
     </Fragment>
   );
 }
