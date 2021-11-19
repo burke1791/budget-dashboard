@@ -17,7 +17,7 @@ function UncategorizedTransactionModal(props) {
 
   return (
     <Modal
-      title='Uncategorized Transaction'
+      title='Categorize Transaction'
       visible={props.visible}
       onCancel={handleCancel}
       style={{ minWidth: '60%', maxWidth: '80%' }}

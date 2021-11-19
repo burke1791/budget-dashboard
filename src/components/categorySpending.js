@@ -11,7 +11,7 @@ const { Column } = Table;
 function CategorySpending(props) {
 
   const [loading, setLoading] = useState(true);
-  const [categorySpending, categorySpendingFetchDate] = useData({ endpoint: `${ENDPOINTS.CATEGORY_SPENDING}/${props.month}`, method: 'GET', processData: parseCategorySpending });
+  const [categorySpending, categorySpendingFetchDate] = useData({ endpoint: `${ENDPOINTS.CATEGORY_SPENDING}/${props.month}`, method: 'GET', processData: parseCategorySpending, conditions: [props.month] });
 
   useEffect(() => {
     setLoading(true);

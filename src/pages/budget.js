@@ -3,18 +3,18 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import React, { Fragment, useEffect, useState } from 'react';
 import moment from 'moment';
-import { useBudgetState } from '../context/budgetContext';
+import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
 import CategorySpending from '../components/categorySpending';
 
 const { Content, Header } = Layout;
 
 function Budget() {
 
-  const [month, setMonth] = useState('');
   const [cashFlowIn, setCashFlowIn] = useState(0);
   const [cashFlowOut, setCashFlowOut] = useState(0);
 
-  const { cashFlowArr, cashFlowArr_trigger } = useBudgetState();
+  const { cashFlowArr, cashFlowArr_trigger, budgetMonth } = useBudgetState();
+  const budgetDispatch = useBudgetDispatch();
 
   useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {
@@ -27,7 +27,7 @@ function Budget() {
   const monthSelected = (event) => {
     if (event != null) {
       let monthString = event.format('YYYY-MM');
-      setMonth(monthString);
+      budgetDispatch({ type: 'update', key: 'budgetMonth', value: monthString });
 
       let [cashIn, cashOut] = findCashFlow(monthString);
       setCashFlows({ cashFlowIn: cashIn, cashFlowOut: cashOut });
@@ -54,8 +54,8 @@ function Budget() {
             <DatePicker
               picker='month'
               format='MMM YYYY'
-              defaultPickerValue={moment()}
-              defaultValue={moment()}
+              defaultPickerValue={moment(budgetMonth)}
+              defaultValue={moment(budgetMonth)}
               monthCellRender={(current) => {
                 let unassignedCount = cashFlowArr?.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
 
@@ -95,7 +95,7 @@ function Budget() {
       <Content>
         <Row justify='center'>
           <Col span={20}>
-            <CategorySpending month={month} />
+            <CategorySpending month={budgetMonth} />
           </Col>
         </Row>
       </Content>

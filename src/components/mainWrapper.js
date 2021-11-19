@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Layout } from 'antd';
+import moment from 'moment';
 import { Redirect, Router } from '@reach/router';
 import Budget from '../pages/budget';
 import Accounts from '../pages/accounts';
@@ -21,6 +22,10 @@ function MainWrapper() {
   const [merchants, merchantFetchDate] = useData({ endpoint: ENDPOINTS.MERCHANTS, method: 'GET' });
 
   const budgetDispatch = useBudgetDispatch();
+
+  useEffect(() => {
+    budgetDispatch({ type: 'update', key: 'budgetMonth', value: moment().format('YYYY-MM') });
+  }, []);
 
   useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {

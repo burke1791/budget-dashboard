@@ -9,10 +9,12 @@ import { useState, useEffect, useCallback } from 'react';
  * @param {Object} options.headers - HTTP headers
  * @param {Object} options.payload - HTTP payload - used for POST requests
  * @param {Function} options.processData - function for processing data returned by the API
+ * @param {Array} options.conditions - a list of conditions that must evaluate to true in order to make the api call
  */
-function useData({ endpoint, method, headers = {}, payload = {}, processData, refreshTrigger }) {
+function useData({ endpoint, method, headers = {}, payload = {}, processData, refreshTrigger, conditions = [] }) {
 
   const [data, setData] = useState();
+  const [isValid, setIsValid] = useState(false);
 
   // used for dependency arrays
   const [stringifiedEndpoint, stringifiedHeaders] = [endpoint, JSON.stringify(headers)];
@@ -23,10 +25,26 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
   const processJson = useCallback(processData || ((jsonBody) => jsonBody), []);
 
   useEffect(() => {
-    fetchApi().then(data => {
-      setData(data);
-    });
-  }, [stringifiedEndpoint, stringifiedHeaders, processJson, refreshTrigger]);
+    setIsValid(evaluateConditions());
+  }, [...conditions]);
+
+  useEffect(() => {
+    if (isValid) {
+      fetchApi().then(data => {
+        setData(data);
+      });
+    }
+  }, [stringifiedEndpoint, stringifiedHeaders, processJson, refreshTrigger, isValid]);
+
+  const evaluateConditions = () => {
+    if (conditions.length == 0) return true;
+
+    for (let condition of conditions) {
+      if (!condition) return false;
+    }
+
+    return true;
+  }
 
   const generateRequestOptions = ({ endpoint, method, headers = {}, payload = {} }) => {
     let options = {
