@@ -1,8 +1,10 @@
 import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox } from 'antd';
 import moment from 'moment';
 import React, { Fragment, useState } from 'react';
+import { useEffect } from 'react/cjs/react.development';
 import { useBudgetState } from '../context/budgetContext';
-import { TRANSACTION_CATEGORIZATION_TYPE } from '../utilities/constants';
+import useData from '../hooks/useData';
+import { ENDPOINTS, TRANSACTION_CATEGORIZATION_TYPE } from '../utilities/constants';
 import { formatMoney } from '../utilities/formatter';
 
 const { Column } = Table;
@@ -133,8 +135,64 @@ function UncategorizedTransactionAction(props) {
       </Row>
       <Divider orientation='left'>Similar Transactions</Divider>
       {/* Table listing similar transactions */}
+      <Row justify='center'>
+        <Col span={24}>
+          <SimilarTransactions transactionId={props?.uncategorizedTransaction[0].transactionId || 0} />
+        </Col>
+      </Row>
     </Fragment>
   )
+}
+
+function SimilarTransactions(props) {
+
+  const [loading, setLoading] = useState(true);
+  const [similarTransactions, similarTransactionsFetchDate] = useData({ 
+    endpoint: `${ENDPOINTS.SIMILAR_TRANSACTIONS}/${props.transactionId}`,
+    method: 'GET',
+    conditions: [props.transactionId]
+  });
+
+  useEffect(() => {
+    console.log(similarTransactionsFetchDate);
+    if (similarTransactionsFetchDate != undefined) {
+      setLoading(false);
+    }
+  }, [similarTransactionsFetchDate]);
+
+  useEffect(() => {
+    setLoading(true);
+  }, [props.transactionId])
+  
+  return (
+    <Table
+      dataSource={similarTransactions}
+      loading={loading}
+      pagination={false}
+      size='small'
+      bordered
+      rowKey='transactionId'
+    >
+      <Column
+        dataIndex='transactionDate'
+        title='Date'
+        render={(value) => moment(value).format('YYYY-MM-DD')}
+      />
+      <Column
+        dataIndex='description'
+        title='Description'
+      />
+      <Column
+        dataIndex='accountName'
+        title='Account'
+      />
+      <Column
+        dataIndex='amount'
+        title='Amount'
+        render={(value) => formatMoney(value)}
+      />
+    </Table>
+  );
 }
 
 function TransactionSearchTextInput(props) {

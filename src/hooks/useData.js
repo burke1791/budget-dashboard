@@ -14,6 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 function useData({ endpoint, method, headers = {}, payload = {}, processData, refreshTrigger, conditions = [] }) {
 
   const [data, setData] = useState();
+  const [fetchDate, setFetchDate] = useState();
   const [isValid, setIsValid] = useState(false);
 
   // used for dependency arrays
@@ -30,8 +31,10 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
 
   useEffect(() => {
     if (isValid) {
+      setData(null);
       fetchApi().then(data => {
         setData(data);
+        setFetchDate(new Date());
       });
     }
   }, [stringifiedEndpoint, stringifiedHeaders, processJson, refreshTrigger, isValid]);
@@ -73,7 +76,7 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
     });
   };
 
-  return [data, new Date()];
+  return [data, fetchDate];
 };
 
 export default useData;
