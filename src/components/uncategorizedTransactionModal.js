@@ -1,8 +1,8 @@
-import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox } from 'antd';
+import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox, Form } from 'antd';
 import moment from 'moment';
 import React, { Fragment, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
-import { useBudgetState } from '../context/budgetContext';
+import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
 import useData from '../hooks/useData';
 import { ENDPOINTS, TRANSACTION_CATEGORIZATION_TYPE } from '../utilities/constants';
 import { formatMoney } from '../utilities/formatter';
@@ -154,7 +154,6 @@ function SimilarTransactions(props) {
   });
 
   useEffect(() => {
-    console.log(similarTransactionsFetchDate);
     if (similarTransactionsFetchDate != undefined) {
       setLoading(false);
     }
@@ -224,6 +223,8 @@ function TransactionSearchTextInput(props) {
 
 function MerchantOptions(props) {
 
+  const [newMerchantModalVisible, setNewMerchantModalVisible] = useState(false);
+
   const { merchants } = useBudgetState();
 
   const generateMerchantsList = () => {
@@ -236,18 +237,41 @@ function MerchantOptions(props) {
     props.merchantSelected(selectedMerchantId);
   }
 
+  const newMerchantClicked = () => {
+    setNewMerchantModalVisible(true);
+  }
+
+  const dismissNewMerchantModal = () => {
+    setNewMerchantModalVisible(false);
+  }
+
   return (
     <Fragment>
       <Text strong>Merchant</Text>
-      <Select
-        showSearch
-        placeholder='Select a merchant'
-        optionFilterProp='children'
-        style={{ width: '100%', marginTop: 6, marginBottom: 6 }}
-        onSelect={merchantSelected}
-      >
-        {generateMerchantsList()}
-      </Select>
+      <Row justify='space-between' align='middle'>
+        <Col span={16}>
+          <Select
+            showSearch
+            placeholder='Select a merchant'
+            optionFilterProp='children'
+            style={{ width: '100%', marginTop: 6, marginBottom: 6 }}
+            onSelect={merchantSelected}
+          >
+            {generateMerchantsList()}
+          </Select>
+        </Col>
+        <Col span={6}>
+          <Button
+            size='small'
+            type='primary'
+            onClick={newMerchantClicked}
+            style={{ width: '100%', height: 30 }}
+          >
+            New Merchant
+          </Button>
+        </Col>
+      </Row>
+      <NewMerchantModal visible={newMerchantModalVisible} dismiss={dismissNewMerchantModal} />
     </Fragment>
   )
 }
@@ -288,6 +312,103 @@ function ThisAccountOnlyCheckbox(props) {
     <Row justify='center'>
       <Checkbox checked={props.checked} onChange={props.thisAccountOnlyChanged}>This Account Only</Checkbox>
     </Row>
+  );
+}
+
+function NewMerchantModal(props) {
+
+  const handleCancel = () => {
+    props.dismiss();
+  }
+
+  return (
+    <Modal
+      title='New Merchant'
+      visible={props.visible}
+      onCancel={handleCancel}
+      style={{ minWidth: '40%', maxWidth: '60%' }}
+      footer={null}
+    >
+      <NewMerchant dismiss={handleCancel} />
+    </Modal>
+  )
+}
+
+function NewMerchant(props) {
+
+  const [loading, setLoading] = useState(false);
+  const [newMerchantObject, setNewMerchantObject] = useState({});
+
+  const [form] = Form.useForm();
+
+  const [newMerchantRecord, newMerchantFetchDate] = useData({
+    endpoint: ENDPOINTS.MERCHANTS,
+    method: 'POST',
+    payload: newMerchantObject,
+    conditions: [newMerchantObject.defaultCategoryId != undefined]
+  });
+
+  const { budgetCategories, merchantFetchDate } = useBudgetState();
+  const budgetDispatch = useBudgetDispatch();
+
+  useEffect(() => {
+    if (newMerchantFetchDate != undefined) {
+      budgetDispatch({ type: 'update', key: 'merchantsRefreshTrigger', value: new Date() });
+    }
+  }, [newMerchantFetchDate]);
+
+  useEffect(() => {
+    if (merchantFetchDate != undefined) {
+      setLoading(false);
+      props.dismiss();
+    }
+  }, [merchantFetchDate]);
+
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 }
+  }
+
+  const tailLayout = {
+    wrapperCol: { offset: 8, span: 16 },
+  };
+
+  const onFinish = (values) => {
+    setLoading(true);
+    setNewMerchantObject({ merchantName: values.merchantName, defaultCategoryId: values.defaultCategoryId });
+  };
+
+  const generateCategoryOptions = () => {
+    if (budgetCategories.length) {
+      return budgetCategories.map(cat => {
+        return <Option key={cat.categoryId} value={cat.categoryId}>{cat.categoryGroupName} | {cat.categoryName}</Option>
+      });
+    }
+
+    return null;
+  }
+
+  return (
+    <Form {...layout} form={form} name='new-merchant' onFinish={onFinish}>
+      <Form.Item name='merchantName' label='Merchant Name' rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+      <Form.Item name='defaultCategoryId' label='Default Category' rules={[{ required: true }]}>
+        <Select
+          placeholder='Select a default category'
+          allowClear
+          showSearch
+          optionFilterProp='children'
+        >
+          {generateCategoryOptions()}
+        </Select>
+      </Form.Item>
+      <Form.Item {...tailLayout}>
+        <Button type='primary' htmlType='submit' loading={loading}>
+          Create New Merchant
+        </Button>
+      </Form.Item>
+    </Form>
   );
 }
 
