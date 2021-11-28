@@ -1,8 +1,9 @@
 import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox, Form } from 'antd';
 import moment from 'moment';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
 import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
+import useApi from '../hooks/useApi';
 import useData from '../hooks/useData';
 import { ENDPOINTS, TRANSACTION_CATEGORIZATION_TYPE } from '../utilities/constants';
 import { formatMoney } from '../utilities/formatter';
@@ -32,9 +33,23 @@ function UncategorizedTransactionModal(props) {
 
 function UncategorizedTransactionAction(props) {
 
+  const similarTransactionsIncluded = useRef({});
+  const [updateTransactionRes, updateTransactionReturnDate, updateTransaction] = useApi({
+    endpoint: ENDPOINTS.TRANSACTION_CATEGORIZE,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const [merchantSearchRes, merchantSearchReturnDate, addNewMerchantSearchString] = useApi({
+    endpoint: ENDPOINTS.MERCHANT_SEARCH_STRING,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
   const [transactionUpdateType, setTransactionUpdateType] = useState(TRANSACTION_CATEGORIZATION_TYPE.MERCHANT);
   const [categoryId, setCategoryId] = useState(null);
   const [merchantId, setMerchantId] = useState(null);
+  const [merchantSearchText, setMerchantSearchText] = useState(null);
+  const [merchantNotLikeText, setMerchantNotLikeText] = useState(null);
   const [thisAccountOnly, setThisAccountOnly] = useState(false);
   const [similarTransactionsLoading, setSimilarTransactionsLoading] = useState(true);
   const [categorizeLoading, setCategorizeLoading] = useState(false);
@@ -52,7 +67,6 @@ function UncategorizedTransactionAction(props) {
   }
 
   const thisAccountOnlyChanged = ({ target: { checked }}) => {
-    console.log(checked);
     setThisAccountOnly(checked);
   }
 
@@ -72,8 +86,81 @@ function UncategorizedTransactionAction(props) {
     return null;
   }
 
-  const categorizeTransaction = () => {
+  const updateIncludedTransactions = (transactionId, included) => {
+    similarTransactionsIncluded.current[transactionId] = included;
+  }
 
+  const constructSimilarTransactionIdString = () => {
+    let included = '';
+    let count = 0;
+
+    Object.keys(similarTransactionsIncluded.current).forEach(id => {
+      if (similarTransactionsIncluded.current[id]) {
+        if (count == 0) {
+          included += `${id}`;
+        } else {
+          included += `,${id}`;
+        }
+
+        count++;
+      }
+    });
+
+    return included;
+  }
+
+  const generateSubmitButton = () => {
+    if (transactionUpdateType == TRANSACTION_CATEGORIZATION_TYPE.MERCHANT) {
+      return (
+        <Button
+          size='small'
+          type='primary'
+          onClick={setMerchantSearch}
+          loading={categorizeLoading}
+          style={{ marginTop: 6 }}
+        >
+          Set Merchant Search
+        </Button>
+      )
+    } else if (transactionUpdateType == TRANSACTION_CATEGORIZATION_TYPE.USER_SELECTED_CATEGORY) {
+      return (
+        <Button
+          size='small'
+          type='primary'
+          onClick={categorizeTransaction}
+          loading={categorizeLoading}
+          style={{ marginTop: 6 }}
+        >
+          Categorize Transaction
+        </Button>
+      );
+    }
+
+    return null;
+  }
+
+  const setMerchantSearch = () => {
+    const payload = {
+      MerchantId: merchantId,
+      SearchString: merchantSearchText,
+      NotLike: merchantNotLikeText,
+      AccountId: props?.uncategorizedTransaction[0].accountId
+    };
+
+    console.log(payload);
+  }
+
+  const categorizeTransaction = () => {
+    const transactionId = props?.uncategorizedTransaction[0].transactionId;
+    const included = constructSimilarTransactionIdString();
+
+    const payload = {
+      TransactionId: transactionId,
+      CategoryId: categoryId,
+      IncludedTransactions: included
+    };
+
+    console.log(payload);
   }
 
   return (
@@ -84,7 +171,7 @@ function UncategorizedTransactionAction(props) {
           <Radio value={TRANSACTION_CATEGORIZATION_TYPE.USER_SELECTED_CATEGORY}>One-Time Category</Radio>
         </Radio.Group>
       </Row>
-      <TransactionSearchTextInput transactionUpdateType={transactionUpdateType} />
+      <TransactionSearchTextInput transactionUpdateType={transactionUpdateType} setSearchText={setMerchantSearchText} setNotLikeText={setMerchantNotLikeText} />
       <Row justify='center'>
         <Col lg={24} xl={18}>
           {renderOptions()}
@@ -92,15 +179,7 @@ function UncategorizedTransactionAction(props) {
       </Row>
       {renderAccountOnlyCheckbox()}
       <Row justify='center'>
-        <Button
-          size='small'
-          type='primary'
-          onClick={categorizeTransaction}
-          loading={categorizeLoading}
-          style={{ marginTop: 6 }}
-        >
-          Categorize Transaction
-        </Button>
+        {generateSubmitButton()}
       </Row>
       <Row justify='center'>
         <Col span={24}>
@@ -137,7 +216,11 @@ function UncategorizedTransactionAction(props) {
       {/* Table listing similar transactions */}
       <Row justify='center'>
         <Col span={24}>
-          <SimilarTransactions transactionId={props?.uncategorizedTransaction[0].transactionId || 0} />
+          <SimilarTransactions
+            transactionId={props?.uncategorizedTransaction[0].transactionId || 0}
+            updateIncluded={updateIncludedTransactions}
+            showIncludeColumn={transactionUpdateType == TRANSACTION_CATEGORIZATION_TYPE.USER_SELECTED_CATEGORY}
+          />
         </Col>
       </Row>
     </Fragment>
@@ -161,7 +244,29 @@ function SimilarTransactions(props) {
 
   useEffect(() => {
     setLoading(true);
-  }, [props.transactionId])
+  }, [props.transactionId]);
+
+  const similarTransactionCheckboxChanged = (transactionId, checkedEvent) => {
+    const included = checkedEvent.target.checked;
+    props.updateIncluded(transactionId, included);
+  }
+
+  const generateIncludeColumn = () => {
+    if (props.showIncludeColumn) {
+      return (
+        <Column
+          title='Include?'
+          render={(value, record) => {
+            return (
+              <Checkbox onChange={(event) => similarTransactionCheckboxChanged(record.transactionId, event)} />
+            );
+          }}
+        />
+      );
+    }
+
+    return null;
+  }
   
   return (
     <Table
@@ -190,31 +295,45 @@ function SimilarTransactions(props) {
         title='Amount'
         render={(value) => formatMoney(value)}
       />
+      {generateIncludeColumn()}
     </Table>
   );
 }
 
 function TransactionSearchTextInput(props) {
 
-  const [searchText, setSearchText] = useState('');
-
   const textChange = ({ target: { value }}) => {
-    setSearchText(value);
+    props.setSearchText(value);
+  }
+
+  const notLikeChange = ({ target: { value }}) => {
+    props.setNotLikeText(value);
   }
 
   if (props.transactionUpdateType == TRANSACTION_CATEGORIZATION_TYPE.MERCHANT) {
     return (
-      <Row justify='center'>
-        <Col lg={24} xl={18}>
-          <Text strong>Search String</Text>
-          <Input
-            placeholder='Identifier'
-            value={searchText}
-            onChange={textChange}
-            style={{ marginTop: 6, marginBottom: 6 }}
-          />
-        </Col>
-      </Row>
+      <Fragment>
+        <Row justify='center'>
+          <Col lg={24} xl={18}>
+            <Text strong>Search String</Text>
+            <Input
+              placeholder='Search string'
+              onChange={textChange}
+              style={{ marginTop: 6, marginBottom: 6 }}
+            />
+          </Col>
+        </Row>
+        <Row justify='center'>
+          <Col lg={24} xl={18}>
+            <Text strong>Not Like</Text>
+            <Input
+              placeholder='Not like'
+              onChange={notLikeChange}
+              style={{ marginTop: 6, marginBottom: 6 }}
+            />
+          </Col>
+        </Row>
+      </Fragment>
     );
   }
 
