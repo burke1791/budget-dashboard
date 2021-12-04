@@ -24,8 +24,7 @@ function TransactionsTable(props) {
 
   useEffect(() => {
     if (props.month != undefined) {
-      setTransactionsLoading(true);
-      setTransactionTrigger(new Date());
+      triggerTransactionsDownload();
     }
   }, [props.month]);
 
@@ -49,6 +48,11 @@ function TransactionsTable(props) {
   const dismissModal = () => {
     setSelectedTransaction({});
     setModalVisible(false);
+  }
+
+  const triggerTransactionsDownload = () => {
+    setTransactionsLoading(true);
+    setTransactionTrigger(new Date());
   }
   
   return (
@@ -98,6 +102,7 @@ function TransactionsTable(props) {
         visible={modalVisible}
         dismiss={dismissModal}
         uncategorizedTransaction={selectedTransaction}
+        triggerTransactionsDownload={triggerTransactionsDownload}
       />
     </Fragment>
   )

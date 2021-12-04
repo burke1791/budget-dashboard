@@ -18,9 +18,11 @@ function useApi({ endpoint, method, headers }) {
     }
 
     axios(options).then(response => {
-      setRes({ data: res.data, isLoading: false, error: null });
+      setRes({ data: response.data, isLoading: false, error: null });
+      setReturnDate(new Date());
     }).catch(error => {
       setRes({ data: null, isLoading: false, error });
+      setReturnDate(new Date());
     });
   }, [endpoint, JSON.stringify(headers)]);
 

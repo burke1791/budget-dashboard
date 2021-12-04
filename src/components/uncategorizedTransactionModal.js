@@ -1,4 +1,4 @@
-import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox, Form } from 'antd';
+import { Col, Divider, Input, Select, Modal, Row, Table, Typography, Button, Radio, Checkbox, Form, message } from 'antd';
 import moment from 'moment';
 import React, { Fragment, useRef, useState } from 'react';
 import { useEffect } from 'react/cjs/react.development';
@@ -26,7 +26,11 @@ function UncategorizedTransactionModal(props) {
       style={{ minWidth: '60%', maxWidth: '80%' }}
       footer={null}
     >
-      <UncategorizedTransactionAction uncategorizedTransaction={[props.uncategorizedTransaction]} />
+      <UncategorizedTransactionAction
+        uncategorizedTransaction={[props.uncategorizedTransaction]}
+        triggerTransactionsDownload={props.triggerTransactionsDownload}
+        dismiss={handleCancel}
+      />
     </Modal>
   );
 }
@@ -53,6 +57,30 @@ function UncategorizedTransactionAction(props) {
   const [thisAccountOnly, setThisAccountOnly] = useState(false);
   const [similarTransactionsLoading, setSimilarTransactionsLoading] = useState(true);
   const [categorizeLoading, setCategorizeLoading] = useState(false);
+
+  useEffect(() => {
+    if (merchantSearchReturnDate) {
+      const count = merchantSearchRes.data[0].count;
+      message.success(`${count} transactions categorized`);
+
+      // trigger re-download of transactions and dismiss modal
+      props.triggerTransactionsDownload();
+      setCategorizeLoading(false);
+      props.dismiss();
+    }
+  }, [merchantSearchReturnDate]);
+
+  useEffect(() => {
+    if (updateTransactionReturnDate) {
+      const count = updateTransactionRes.data[0].count;
+      message.success(`${count} transactions categorized`);
+
+      // trigger re-download of transactions and dismiss modal
+      props.triggerTransactionsDownload();
+      setCategorizeLoading(false);
+      props.dismiss();
+    }
+  }, [updateTransactionReturnDate]);
 
   const transactionUpdateTypeSelected = ({ target: { value }}) => {
     setTransactionUpdateType(value);
@@ -144,15 +172,13 @@ function UncategorizedTransactionAction(props) {
       MerchantId: merchantId,
       SearchString: merchantSearchText,
       NotLike: merchantNotLikeText,
-      AccountId: props?.uncategorizedTransaction[0].accountId
+      AccountId: thisAccountOnly ? props?.uncategorizedTransaction[0].accountId : null
     };
 
-    console.log(payload);
+    setCategorizeLoading(true);
 
-    // set loading true
     // send POST request
-    // trigger redownload of transactions
-    // after transactions downloaded, set loading false & close modal
+    addNewMerchantSearchString(payload);
   }
 
   const categorizeTransaction = () => {
@@ -167,10 +193,10 @@ function UncategorizedTransactionAction(props) {
 
     console.log(payload);
 
-    // set loading true
+    setCategorizeLoading(true);
+
     // send POST request
-    // trigger redownload of transactions
-    // after transactions downloaded, set loading false & close modal
+    updateTransaction(payload);
   }
 
   return (
