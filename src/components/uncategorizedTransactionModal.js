@@ -148,6 +148,11 @@ function UncategorizedTransactionAction(props) {
     };
 
     console.log(payload);
+
+    // set loading true
+    // send POST request
+    // trigger redownload of transactions
+    // after transactions downloaded, set loading false & close modal
   }
 
   const categorizeTransaction = () => {
@@ -161,6 +166,11 @@ function UncategorizedTransactionAction(props) {
     };
 
     console.log(payload);
+
+    // set loading true
+    // send POST request
+    // trigger redownload of transactions
+    // after transactions downloaded, set loading false & close modal
   }
 
   return (
