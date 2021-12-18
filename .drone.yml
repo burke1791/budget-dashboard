@@ -16,6 +16,7 @@ steps:
   - name: build
     image: alpine
     commands:
+      - cd budget-dashboard/
       - npm install
       - npm run build
       - echo $(whoami)
