@@ -10,4 +10,3 @@ steps:
       - npm run build
       - echo $(whoami)
       - echo "SUCCESS!"
-      - echo "perhaps now?"
