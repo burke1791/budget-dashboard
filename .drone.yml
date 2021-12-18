@@ -10,6 +10,7 @@ steps:
     image: alpine/git
     commands:
       - git clone http://gitea.burkcules.burke/burke/budget-dashboard.git
+      - cd budget-dashboard/
       - git checkout $DRONE_COMMIT
 
   - name: build
