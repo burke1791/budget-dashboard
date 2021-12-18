@@ -9,3 +9,4 @@ steps:
       - npm install
       - npm run build
       - echo $(whoami)
+      - echo "SUCCESS!"
