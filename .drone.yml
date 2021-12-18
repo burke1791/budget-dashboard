@@ -1,4 +1,4 @@
-kine: pipeline
+kind: pipeline
 type: docker
 name: build-and-deploy
 
