@@ -17,6 +17,7 @@ steps:
     image: node:14
     commands:
       - cd budget-dashboard/
+      - unset CI # don't count warnings as errors
       - npm install
       - npm run build
       - echo $(whoami)
