@@ -1,0 +1,11 @@
+kine: pipeline
+type: docker
+name: build-and-deploy
+
+steps:
+  - name: build
+    image: alpine
+    commands:
+      - npm install
+      - npm run build
+      - echo $(whoami)
