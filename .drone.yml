@@ -12,6 +12,10 @@ steps:
       - git clone http://gitea.burkcules.burke/burke/budget-dashboard.git
       - cd budget-dashboard/
       - git checkout $DRONE_COMMIT
+    when:
+      branch:
+        - stage
+        - master
 
   - name: build
     image: node:14
@@ -20,12 +24,20 @@ steps:
       - unset CI # don't count warnings as errors
       - npm install
       - npm run build
+    when:
+      branch:
+        - stage
+        - master
       
   - name: test
     image: node:14
     commands:
       - cd budget-dashboard/
       - echo "I should implement tests at some point"
+    when:
+      branch:
+        - stage
+        - master
 
   - name: deploy-stage
     image: appleboy/drone-scp
