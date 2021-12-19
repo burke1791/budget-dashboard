@@ -39,6 +39,11 @@ steps:
   #     target: /var/www/budget
   #     source: ./budget-dashboard/build/*
 
+  - name: new-file
+    image: node:14
+    commands:
+      - touch test.txt
+
   - name: scp-test
     image: appleboy/drone-scp
     settings:
@@ -47,4 +52,4 @@ steps:
       password: testpw
       port: 22
       target: /home/test-deploy
-      source: ./budget-dashboard/build/index.html
+      source: ./test.txt
