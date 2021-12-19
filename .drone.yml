@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: build-and-deploy
+name: build
 
 clone:
   disable: true
@@ -12,10 +12,6 @@ steps:
       - git clone http://gitea.burkcules.burke/burke/budget-dashboard.git
       - cd budget-dashboard/
       - git checkout $DRONE_COMMIT
-    when:
-      branch:
-        - stage
-        - master
 
   - name: build
     image: node:14
@@ -24,20 +20,40 @@ steps:
       - unset CI # don't count warnings as errors
       - npm install
       - npm run build
-    when:
-      branch:
-        - stage
-        - master
       
   - name: test
     image: node:14
     commands:
       - cd budget-dashboard/
       - echo "I should implement tests at some point"
+
+  - name: promote-stage
+    image: node:14
+    commands:
+      - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER stage
     when:
       branch:
         - stage
+
+  - name: promote-prod
+    image: node:14
+    commands:
+      - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER production
+    when:
+      branch:
         - master
+
+trigger:
+  branch:
+    - stage
+    - master
+  event:
+    - push
+
+---
+kind: pipeline
+type: docker
+name: deploy
 
   - name: deploy-stage
     image: appleboy/drone-scp
@@ -56,7 +72,7 @@ steps:
       branch:
         - stage
       event:
-        - pull_request
+        - promote
 
   - name: deploy-prod
     image: appleboy/drone-scp
@@ -75,4 +91,10 @@ steps:
       branch:
         - master
       event:
-        - pull_request
+        - promote
+
+trigger:
+  event:
+    - promote
+  target: 
+    - production
