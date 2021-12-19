@@ -55,6 +55,7 @@ kind: pipeline
 type: docker
 name: deploy
 
+steps:
   - name: deploy-stage
     image: appleboy/drone-scp
     settings:
