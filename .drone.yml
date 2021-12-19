@@ -28,7 +28,7 @@ steps:
       - echo "I should implement tests at some point"
 
   - name: promote-stage
-    image: node:14
+    image: drone/cli
     commands:
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER stage
     when:
@@ -36,7 +36,7 @@ steps:
         - stage
 
   - name: promote-prod
-    image: node:14
+    image: drone/cli
     commands:
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER production
     when:
