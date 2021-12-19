@@ -31,8 +31,10 @@ steps:
     image: appleboy/drone-scp
     settings:
       host: 192.168.1.12
-      username: $SSH_USER
-      password: $SSH_PASSWORD
+      username:
+        from_secret: SSH_USER
+      password:
+        from_secret: SSH_PASSWORD
       port: 22
       target: /var/www/budget
       source: budget-dashboard/build/*
