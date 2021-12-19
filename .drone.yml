@@ -20,5 +20,19 @@ steps:
       - unset CI # don't count warnings as errors
       - npm install
       - npm run build
-      - echo $(whoami)
-      - echo "SUCCESS!"
+      
+  - name: test
+    image: node:14
+    commands:
+      - cd budget-dashboard/
+      - echo "I should implement tests at some point"
+
+  - name: deploy
+    image: appleboy/drone-scp
+    settings:
+      host: 192.168.1.12
+      username: $SSH_USER
+      password: $SSH_PASSWORD
+      port: 22
+      target: /var/www/budget
+      source: budget-dashboard/build/*
