@@ -36,7 +36,7 @@ steps:
         - stage
 
   - name: promote-prod
-    image: drone/cli
+    image: rancher/drone-images
     commands:
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER production
     when:
