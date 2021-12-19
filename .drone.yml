@@ -28,16 +28,20 @@ steps:
       - echo "I should implement tests at some point"
 
   - name: promote-stage
-    image: rancher/drone-images
+    image: alpine
     commands:
+      - curl -L https://github.com/harness/drone-cli/releases/latest/download/drone_linux_amd64.tar.gz | tar zx
+      - sudo install -t /usr/local/bin drone
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER stage
     when:
       branch:
         - stage
 
   - name: promote-prod
-    image: rancher/drone-images
+    image: alpine
     commands:
+      - curl -L https://github.com/harness/drone-cli/releases/latest/download/drone_linux_amd64.tar.gz | tar zx
+      - sudo install -t /usr/local/bin drone
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER production
     when:
       branch:
