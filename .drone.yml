@@ -37,4 +37,4 @@ steps:
         from_secret: SSH_PASSWORD
       port: 22
       target: /var/www/budget
-      source: budget-dashboard/build/*
+      source: ./budget-dashboard/build/*
