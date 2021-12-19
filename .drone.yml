@@ -28,7 +28,7 @@ steps:
       - echo "I should implement tests at some point"
 
   - name: promote-stage
-    image: drone/cli
+    image: rancher/drone-images
     commands:
       - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER stage
     when:
