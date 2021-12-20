@@ -1,0 +1,69 @@
+kind: pipeline
+type: docker
+name: build
+
+clone:
+  disable: true
+
+steps:
+  - name: clone
+    image: alpine/git
+    commands:
+      - git clone http://gitea.burkcules.burke/burke/budget-dashboard.git
+      - cd budget-dashboard/
+      - git checkout $DRONE_COMMIT
+
+  - name: build
+    image: node:14
+    commands:
+      - cd budget-dashboard/
+      - unset CI # don't count warnings as errors
+      - npm install
+      - npm run build
+      
+  - name: test
+    image: node:14
+    commands:
+      - cd budget-dashboard/
+      - echo "I should implement tests at some point"
+
+  - name: deploy-stage
+    image: appleboy/drone-scp
+    settings:
+      host: 192.168.1.12
+      username:
+        from_secret: SSH_USER
+      password:
+        from_secret: SSH_PASSWORD
+      port: 22
+      target: /var/www/budget
+      source: ./budget-dashboard/build/*
+      strip_components: 2
+      rm: true
+    when:
+      branch:
+        - stage
+
+  - name: deploy-prod
+    image: appleboy/drone-scp
+    settings:
+      host: 192.168.1.20
+      username:
+        from_secret: SSH_USER_PROD
+      password:
+        from_secret: SSH_PASSWORD_PROD
+      port: 22
+      target: /var/www/budget
+      source: ./budget-dashboard/build/*
+      strip_components: 2
+      rm: true
+    when:
+      branch:
+        - master
+
+trigger:
+  branch:
+    - stage
+    - master
+  event:
+    - push
