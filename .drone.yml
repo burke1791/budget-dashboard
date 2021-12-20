@@ -27,39 +27,6 @@ steps:
       - cd budget-dashboard/
       - echo "I should implement tests at some point"
 
-  - name: promote-stage
-    image: alpine
-    commands:
-      - wget https://github.com/harness/drone-cli/releases/latest/download/drone_linux_amd64.tar.gz | tar zx
-      - sudo install -t /usr/local/bin drone
-      - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER stage
-    when:
-      branch:
-        - stage
-
-  - name: promote-prod
-    image: alpine
-    commands:
-      - wget https://github.com/harness/drone-cli/releases/latest/download/drone_linux_amd64.tar.gz | tar zx
-      - sudo install -t /usr/local/bin drone
-      - drone build promote burke/budget-dashboard $DRONE_BUILD_NUMBER production
-    when:
-      branch:
-        - master
-
-trigger:
-  branch:
-    - stage
-    - master
-  event:
-    - push
-
----
-kind: pipeline
-type: docker
-name: deploy
-
-steps:
   - name: deploy-stage
     image: appleboy/drone-scp
     settings:
@@ -76,8 +43,6 @@ steps:
     when:
       branch:
         - stage
-      event:
-        - promote
 
   - name: deploy-prod
     image: appleboy/drone-scp
@@ -95,11 +60,10 @@ steps:
     when:
       branch:
         - master
-      event:
-        - promote
 
 trigger:
+  branch:
+    - stage
+    - master
   event:
-    - promote
-  target: 
-    - production
+    - push
