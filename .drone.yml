@@ -13,13 +13,31 @@ steps:
       - cd budget-dashboard/
       - git checkout $DRONE_COMMIT
 
-  - name: build
+  - name: build-stage
     image: node:14
+    env:
+      REACT_APP_BASE_URL: http://stage.budget.burkcules.burke/
     commands:
       - cd budget-dashboard/
       - unset CI # don't count warnings as errors
       - npm install
       - npm run build
+    when:
+      branch:
+        - stage
+
+  - name: build-prod
+    image: node:14
+    env:
+      REACT_APP_BASE_URL: http://budget.burkcules.burke/
+    commands:
+      - cd budget-dashboard/
+      - unset CI # don't count warnings as errors
+      - npm install
+      - npm run build
+    when:
+      branch:
+        - master
       
   - name: test
     image: node:14
