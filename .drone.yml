@@ -21,7 +21,7 @@ steps:
       - cd budget-dashboard/
       - unset CI # don't count warnings as errors
       - npm install
-      - npm run build
+      - REACT_APP_BASE_URL=$${REACT_APP_BASE_URL} npm run build
     when:
       branch:
         - stage
@@ -34,7 +34,7 @@ steps:
       - cd budget-dashboard/
       - unset CI # don't count warnings as errors
       - npm install
-      - npm run build
+      - REACT_APP_BASE_URL=$${REACT_APP_BASE_URL} npm run build
     when:
       branch:
         - master

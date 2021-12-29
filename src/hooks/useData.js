@@ -51,7 +51,7 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
 
   const generateRequestOptions = ({ endpoint, method, headers = {}, payload = {} }) => {
     let options = {
-      url: `/${endpoint}`,
+      url: process.env.REACT_APP_BASE_URL + endpoint,
       headers: headers,
       method: method
     };
