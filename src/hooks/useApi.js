@@ -8,7 +8,7 @@ function useApi({ endpoint, method, headers }) {
   const callApi = useCallback((payload) => {
     setRes(prevState => ({ ...prevState, isLoading: true }));
     const options = {
-      url: endpoint,
+      url: `/${endpoint}`,
       headers: headers,
       method: method
     };
