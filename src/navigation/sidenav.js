@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { navigate } from '@reach/router';
 import { Badge, Layout, Menu, Typography } from 'antd';
 import 'antd/dist/antd.css'
 import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
 import { calculateTotalUnassignedTransactions } from '../utilities/apiHelper';
 import { useBudgetState } from '../context/budgetContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Sider } = Layout;
 const { Text } = Typography;
@@ -15,6 +15,7 @@ function Sidenav(props) {
   const [selectedItem, setSelectedItem] = useState('dashboard');
 
   const { budgetMonth } = useBudgetState();
+  const navigate = useNavigate();
 
   const [unassignedTransactionCount, unassignedTransactionCountFetchDate] = useData({
     endpoint: ENDPOINTS.UNASSIGNED_TRANSACTION_COUNTS,
