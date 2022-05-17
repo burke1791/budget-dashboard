@@ -5,6 +5,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import moment from 'moment';
 import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
 import CategorySpending from '../components/categorySpending';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const { Content, Header } = Layout;
 
@@ -15,6 +16,12 @@ function Budget() {
 
   const { cashFlowArr, cashFlowArr_trigger, budgetMonth } = useBudgetState();
   const budgetDispatch = useBudgetDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log(location);
+  }, [JSON.stringify(location)]);
 
   useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {
@@ -27,6 +34,7 @@ function Budget() {
   const monthSelected = (event) => {
     if (event != null) {
       let monthString = event.format('YYYY-MM');
+      setSearchParams({ month: monthString });
       budgetDispatch({ type: 'update', key: 'budgetMonth', value: monthString });
 
       let [cashIn, cashOut] = findCashFlow(monthString);

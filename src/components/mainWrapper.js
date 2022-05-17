@@ -12,7 +12,7 @@ import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
 import { parseCashFlow } from '../utilities/apiHelper';
 import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 function MainWrapper() {
 
@@ -65,6 +65,7 @@ function MainWrapper() {
         <Route path='/accounts' element={<Accounts />} />
         <Route path='/transactions' element={<Transactions />} />
         <Route path='/categories' element={<Categories />} />
+        <Route path='*' element={<Navigate to='/dashboard' replace />} />
       </Routes>
     </Layout>
   );
