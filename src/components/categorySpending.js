@@ -18,7 +18,8 @@ function CategorySpending(props) {
   }, [props.month]);
 
   useEffect(() => {
-    if (categorySpending && categorySpending.length > 0) {
+    console.log(categorySpending);
+    if (categorySpending != undefined) {
       setLoading(false);
     }
   }, [categorySpendingFetchDate]);
