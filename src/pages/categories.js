@@ -15,31 +15,33 @@ function Categories() {
     let categoryGroups = [];
     let processedGroups = [];
 
-    budgetCategories.forEach(category => {
-      let groupId = category.categoryGroupId;
-      let groupName = category.categoryGroupName;
+    if (budgetCategories?.length > 0) {
+      budgetCategories.forEach(category => {
+        let groupId = category.categoryGroupId;
+        let groupName = category.categoryGroupName;
 
-      let cat = {
-        categoryId: category.categoryId,
-        categoryName: category.categoryName
-      };
-
-      if (processedGroups.find(groupNum => { return groupNum == groupId})) {
-        // if we've already parsed the categoryGroup, add this category to the list
-        categoryGroups.find(group => group.groupId == groupId).categories.push(cat);
-      } else {
-        // new categoryGroup
-        let group = {
-          groupId: groupId,
-          groupName: groupName,
-          displayOrder: category.displayOrder,
-          categories: [cat]
+        let cat = {
+          categoryId: category.categoryId,
+          categoryName: category.categoryName
         };
 
-        categoryGroups.push(group);
-        processedGroups.push(groupId);
-      }
-    });
+        if (processedGroups.find(groupNum => { return groupNum == groupId})) {
+          // if we've already parsed the categoryGroup, add this category to the list
+          categoryGroups.find(group => group.groupId == groupId).categories.push(cat);
+        } else {
+          // new categoryGroup
+          let group = {
+            groupId: groupId,
+            groupName: groupName,
+            displayOrder: category.displayOrder,
+            categories: [cat]
+          };
+
+          categoryGroups.push(group);
+          processedGroups.push(groupId);
+        }
+      });
+    }
 
     return categoryGroups;
   }

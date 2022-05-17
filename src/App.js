@@ -5,17 +5,20 @@ import 'antd/dist/antd.css'
 import { BudgetProvider } from './context/budgetContext';
 import MainWrapper from './components/mainWrapper';
 import Sidenav from './navigation/sidenav';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
 
   return (
-    <BudgetProvider>
-      <Layout>
-        <Sidenav />
+    <BrowserRouter>
+      <BudgetProvider>
+        <Layout>
+          <Sidenav />
 
-        <MainWrapper />
-      </Layout>
-    </BudgetProvider>
+          <MainWrapper />
+        </Layout>
+      </BudgetProvider>
+    </BrowserRouter>
   );
 }
 

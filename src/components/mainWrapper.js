@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Layout } from 'antd';
 import moment from 'moment';
-import { Redirect, Router } from '@reach/router';
 import Budget from '../pages/budget';
 import Accounts from '../pages/accounts';
 import Categories from '../pages/categories';
@@ -13,6 +12,7 @@ import useData from '../hooks/useData';
 import { ENDPOINTS } from '../utilities/constants';
 import { parseCashFlow } from '../utilities/apiHelper';
 import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 function MainWrapper() {
 
@@ -59,15 +59,14 @@ function MainWrapper() {
 
   return (
     <Layout style={{ marginLeft: 200, minHeight: '100vh', height: '100%' }} theme='light'>
-      <Router>
-        <Redirect noThrow from='/' to='/dashboard' />
-
-        <Dashboard path='/dashboard' />
-        <Budget path='/budget' />
-        <Accounts path='/accounts' />
-        <Transactions path='/transactions' />
-        <Categories path='/categories' />
-      </Router>
+      <Routes>
+        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/budget' element={<Budget />} />
+        <Route path='/accounts' element={<Accounts />} />
+        <Route path='/transactions' element={<Transactions />} />
+        <Route path='/categories' element={<Categories />} />
+        <Route path='*' element={<Navigate to='/dashboard' replace />} />
+      </Routes>
     </Layout>
   );
 }
