@@ -1,21 +1,33 @@
 import { Layout, Row, Col, DatePicker, Badge } from 'antd';
 import moment from 'moment';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import TransactionsTable from '../components/transactionsTable';
-import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
+import { useBudgetState } from '../context/budgetContext';
 import './styles/transactions.css';
 
 const { Content, Header } = Layout;
 
 function Transactions(props) {
   
-  const { cashFlowArr, budgetMonth } = useBudgetState();
-  const budgetDispatch = useBudgetDispatch();
+  const { cashFlowArr } = useBudgetState();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [month, setMonth] = useState('');
+
+  useEffect(() => {
+    const searchMonth = searchParams.get('month');
+
+    if (searchMonth == undefined) {
+      setSearchParams({ month: moment().format('YYYY-MM') });
+    } else {
+      setMonth(searchParams.get('month'));
+    }
+  }, [searchParams.get('month')]);
 
   const monthSelected = (event) => {
     if (event != null) {
-      let monthString = event.format('YYYY-MM');
-      budgetDispatch({ type: 'update', key: 'budgetMonth', value: monthString });
+      const monthString = event.format('YYYY-MM');
+      setSearchParams({ month: monthString });
     }
   }
   
@@ -27,8 +39,7 @@ function Transactions(props) {
             <DatePicker
               picker='month'
               format='MMM YYYY'
-              defaultPickerValue={moment(budgetMonth)}
-              defaultValue={moment(budgetMonth)}
+              value={moment(month)}
               monthCellRender={(current) => {
                 let unassignedCount = cashFlowArr?.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
 
@@ -48,7 +59,7 @@ function Transactions(props) {
       <Content>
         <Row justify='center'>
           <Col span={20}>
-            <TransactionsTable month={budgetMonth} />
+            <TransactionsTable month={month} />
           </Col>
         </Row>
       </Content>
