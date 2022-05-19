@@ -29,10 +29,6 @@ function MainWrapper() {
   });
 
   useEffect(() => {
-    budgetDispatch({ type: 'update', key: 'budgetMonth', value: moment().format('YYYY-MM') });
-  }, []);
-
-  useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {
       budgetDispatch({ type: 'update', key: 'cashFlowArr', value: cashFlowArr });
     }
