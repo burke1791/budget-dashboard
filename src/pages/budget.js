@@ -3,9 +3,9 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import React, { Fragment, useEffect, useState } from 'react';
 import moment from 'moment';
-import { useBudgetDispatch, useBudgetState } from '../context/budgetContext';
+import { useBudgetState } from '../context/budgetContext';
 import CategorySpending from '../components/categorySpending';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 const { Content, Header } = Layout;
 
@@ -13,15 +13,20 @@ function Budget() {
 
   const [cashFlowIn, setCashFlowIn] = useState(0);
   const [cashFlowOut, setCashFlowOut] = useState(0);
+  const [month, setMonth] = useState('');
 
-  const { cashFlowArr, cashFlowArr_trigger, budgetMonth } = useBudgetState();
-  const budgetDispatch = useBudgetDispatch();
+  const { cashFlowArr, cashFlowArr_trigger } = useBudgetState();
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
 
   useEffect(() => {
-    console.log(location);
-  }, [JSON.stringify(location)]);
+    const searchMonth = searchParams.get('month');
+
+    if (searchMonth == undefined) {
+      setSearchParams({ month: moment().format('YYYY-MM') });
+    } else {
+      setMonth(searchParams.get('month'));
+    }
+  }, [searchParams.get('month')]);
 
   useEffect(() => {
     if (cashFlowArr && cashFlowArr.length > 0) {
@@ -33,11 +38,10 @@ function Budget() {
 
   const monthSelected = (event) => {
     if (event != null) {
-      let monthString = event.format('YYYY-MM');
+      const monthString = event.format('YYYY-MM');
       setSearchParams({ month: monthString });
-      budgetDispatch({ type: 'update', key: 'budgetMonth', value: monthString });
 
-      let [cashIn, cashOut] = findCashFlow(monthString);
+      const [cashIn, cashOut] = findCashFlow(monthString);
       setCashFlows({ cashFlowIn: cashIn, cashFlowOut: cashOut });
     }
   }
@@ -62,8 +66,7 @@ function Budget() {
             <DatePicker
               picker='month'
               format='MMM YYYY'
-              defaultPickerValue={moment(budgetMonth)}
-              defaultValue={moment(budgetMonth)}
+              value={moment(month)}
               monthCellRender={(current) => {
                 let unassignedCount = cashFlowArr?.find(cashFlow => cashFlow.month.format('YYYY-MM') === current.format('YYYY-MM'))?.unassignedTransactions || 0;
 
@@ -103,7 +106,7 @@ function Budget() {
       <Content>
         <Row justify='center'>
           <Col span={20}>
-            <CategorySpending month={budgetMonth} />
+            <CategorySpending month={month} />
           </Col>
         </Row>
       </Content>

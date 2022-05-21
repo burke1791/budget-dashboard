@@ -14,7 +14,6 @@ function Sidenav(props) {
 
   const [selectedItem, setSelectedItem] = useState('');
 
-  const { budgetMonth } = useBudgetState();
   const navigate = useNavigate();
   const location = useLocation();
 
