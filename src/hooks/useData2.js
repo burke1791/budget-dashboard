@@ -7,38 +7,22 @@ import { useState, useEffect, useCallback } from 'react';
  * @param {String} options.endpoint - API endpoint
  * @param {String} options.method - HTTP method
  * @param {Object} options.headers - HTTP headers
- * @param {Object} options.payload - HTTP payload - used for POST requests
  * @param {Function} options.processData - function for processing data returned by the API
- * @param {Number} options.refreshTrigger - triggers another API call when changed. Typically set to (new Date().valueOf())
  * @param {Array} options.conditions - a list of conditions that must evaluate to true in order to make the api call
  */
-function useData({ endpoint, method, headers = {}, payload = {}, processData, refreshTrigger, conditions = [] }) {
+function useData2({ endpoint, method, headers = {}, processData, conditions = [] }) {
 
   const [data, setData] = useState();
   const [fetchDate, setFetchDate] = useState();
   const [isValid, setIsValid] = useState(false);
 
-  // used for dependency arrays
-  const [stringifiedEndpoint, stringifiedHeaders] = [endpoint, JSON.stringify(headers)];
-
   // If no processing function is passed just return the data
   // The callback hook ensures that the function is only created once
-  // and hence the effect hook below doesn't start an infinite loop
   const processJson = useCallback(processData || ((jsonBody) => jsonBody), []);
 
   useEffect(() => {
     setIsValid(evaluateConditions());
   }, [...conditions]);
-
-  useEffect(() => {
-    if (isValid) {
-      setData(null);
-      fetchApi().then(data => {
-        setData(data);
-        setFetchDate(new Date());
-      });
-    }
-  }, [stringifiedEndpoint, stringifiedHeaders, processJson, refreshTrigger, isValid]);
 
   const evaluateConditions = () => {
     if (conditions.length == 0) return true;
@@ -64,7 +48,7 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
     return options;
   }
 
-  const fetchApi = () => {
+  const fetchApi = (payload) => {
     let options = generateRequestOptions({ endpoint, method, headers, payload });
 
     return new Promise((resolve, reject) => {
@@ -77,7 +61,17 @@ function useData({ endpoint, method, headers = {}, payload = {}, processData, re
     });
   };
 
-  return [data, fetchDate];
+  const callApi = (payload) => {
+    if (isValid) {
+      setData(null);
+      fetchApi(payload).then(data => {
+        setData(processJson(data));
+        setFetchDate(new Date());
+      });
+    }
+  }
+
+  return [data, fetchDate, callApi];
 };
 
-export default useData;
+export default useData2;
