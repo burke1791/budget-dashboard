@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Table } from 'antd';
-import UncategorizedTransactionModal from './uncategorizedTransactionModal';
+import { UncategorizedTransactionModal } from './uncategorizedTransactionModal';
 import moment from 'moment';
 import { formatMoney } from '../utilities/formatter';
 import useData from '../hooks/useData';
